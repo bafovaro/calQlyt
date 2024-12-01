@@ -1,0 +1,7 @@
+{
+  "name": "calQlyt",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
