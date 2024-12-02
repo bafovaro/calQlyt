@@ -126,7 +126,7 @@ const stepBack = () => {
         lastDisplay.value = '';
       }
     } else {
-      const lastHistoryEntry = history.value.pop();
+      const lastHistoryEntry = history.value[history.value.length - 1];
       if (lastHistoryEntry) {
         const [equation, answer] = lastHistoryEntry.split(' = ');
         display.value = equation.trim(); // Show the equation when stepping back
