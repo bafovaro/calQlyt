@@ -2,13 +2,13 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Calculator</ion-title>
+        <ion-title class="centered-title">calQlyt</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Calculator</ion-title>
+          <ion-title class="centered-title">calQlyt</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -19,26 +19,26 @@
           <div></div>
           <div></div>
           <div></div>
-          <ion-button @click.stop="append('7')" expand="full">7</ion-button>
-          <ion-button @click.stop="append('8')" expand="full">8</ion-button>
-          <ion-button @click.stop="append('9')" expand="full">9</ion-button>
-          <ion-button @click.stop="append('/')" expand="full">/</ion-button>
-          <ion-button @click.stop="append('4')" expand="full">4</ion-button>
-          <ion-button @click.stop="append('5')" expand="full">5</ion-button>
-          <ion-button @click.stop="append('6')" expand="full">6</ion-button>
-          <ion-button @click.stop="append('*')" expand="full">*</ion-button>
-          <ion-button @click.stop="append('1')" expand="full">1</ion-button>
-          <ion-button @click.stop="append('2')" expand="full">2</ion-button>
-          <ion-button @click.stop="append('3')" expand="full">3</ion-button>
-          <ion-button @click.stop="append('-')" expand="full">-</ion-button>
+          <ion-button @click.stop="append('7')" expand="full" :disabled="showHistory">7</ion-button>
+          <ion-button @click.stop="append('8')" expand="full" :disabled="showHistory">8</ion-button>
+          <ion-button @click.stop="append('9')" expand="full" :disabled="showHistory">9</ion-button>
+          <ion-button @click.stop="append('/')" expand="full" :disabled="showHistory">/</ion-button>
+          <ion-button @click.stop="append('4')" expand="full" :disabled="showHistory">4</ion-button>
+          <ion-button @click.stop="append('5')" expand="full" :disabled="showHistory">5</ion-button>
+          <ion-button @click.stop="append('6')" expand="full" :disabled="showHistory">6</ion-button>
+          <ion-button @click.stop="append('*')" expand="full" :disabled="showHistory">*</ion-button>
+          <ion-button @click.stop="append('1')" expand="full" :disabled="showHistory">1</ion-button>
+          <ion-button @click.stop="append('2')" expand="full" :disabled="showHistory">2</ion-button>
+          <ion-button @click.stop="append('3')" expand="full" :disabled="showHistory">3</ion-button>
+          <ion-button @click.stop="append('-')" expand="full" :disabled="showHistory">-</ion-button>
           <ion-button @click.stop="stepBack" expand="full" class="backspace"><<</ion-button>
-          <ion-button @click.stop="backspace" expand="full" class="backspace">&lt;</ion-button>
-          <ion-button @click.stop="append('0')" expand="full">0</ion-button>
-          <ion-button @click.stop="append('+')" expand="full">+</ion-button>
+          <ion-button @click.stop="backspace" expand="full" class="backspace" :disabled="showHistory">&lt;</ion-button>
+          <ion-button @click.stop="append('0')" expand="full" :disabled="showHistory">0</ion-button>
+          <ion-button @click.stop="append('+')" expand="full" :disabled="showHistory">+</ion-button>
           <div></div>
           <div></div>
-          <ion-button @click.stop="append('.')" expand="full">.</ion-button>
-          <ion-button @click.stop="calculateExpression" expand="full" color="success">=</ion-button>
+          <ion-button @click.stop="append('.')" expand="full" :disabled="showHistory">.</ion-button>
+          <ion-button @click.stop="calculateExpression" expand="full" color="success" :disabled="showHistory">=</ion-button>
         </div>
       </div>
     </ion-content>
@@ -49,18 +49,14 @@
 import { ref } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/vue';
 
+const showHistory = ref(false);
 const display = ref('');
 const history = ref([]);
 const currentInput = ref('');
-const viewingHistory = ref(false);
-const showHistory = ref(false);
 const lastDisplay = ref('');
-const isSteppingBack = ref(false);
+const lastSteppedBack = ref(false);
 
 const append = (char) => {
-  if (display.value === 'Error') {
-    display.value = '';
-  }
   display.value += char;
   currentInput.value += char;
 };
@@ -69,8 +65,8 @@ const clearAll = () => {
   display.value = '';
   history.value = [];
   currentInput.value = '';
-  viewingHistory.value = false;
   lastDisplay.value = '';
+  lastSteppedBack.value = false;
 };
 
 const backspace = () => {
@@ -81,11 +77,39 @@ const backspace = () => {
   currentInput.value = currentInput.value.slice(0, -1);
 };
 
+const collapseHistory = () => {
+  console.log('Collapsing history...');
+  console.log('Before collapse - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
+  if (showHistory.value) {
+    showHistory.value = false;
+    if (history.value.length > 0) {
+      const lastEntry = history.value[history.value.length - 1];
+      const [equation, answer] = lastEntry.split(' = ');
+      display.value = answer.trim(); // Show the answer of the latest history equation when collapsing
+    } else {
+      display.value = '';
+    }
+    lastDisplay.value = display.value; // Update lastDisplay to the latest value
+  }
+  console.log('After collapse - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
+};
+
+const toggleHistory = () => {
+  console.log('Toggling history...');
+  console.log('Before toggle - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value);
+  if (showHistory.value) {
+    display.value = lastDisplay.value;
+  } else {
+    lastDisplay.value = display.value;
+    display.value = history.value.join('\n');
+  }
+  showHistory.value = !showHistory.value;
+  console.log('After toggle - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value);
+};
+
 const stepBack = () => {
   console.log('Stepping back...');
   console.log('Before step back - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
-  isSteppingBack.value = true;
-
   if (currentInput.value) {
     currentInput.value = '';
     display.value = '';
@@ -95,48 +119,56 @@ const stepBack = () => {
       history.value.pop();
       display.value = history.value.join('\n');
     } else {
-      if (display.value === history.value[history.value.length - 1]) {
+      const lastHistoryEntry = history.value[history.value.length - 1];
+      const [equation, answer] = lastHistoryEntry.split(' = ');
+      if (lastSteppedBack.value) {
         // Remove the latest history item and move to the next
         history.value.pop();
-      }
-      if (history.value.length > 0) {
-        display.value = history.value[history.value.length - 1];
+        lastSteppedBack.value = false;
+        if (history.value.length > 0) {
+          const previousHistoryEntry = history.value[history.value.length - 1];
+          display.value = previousHistoryEntry.split(' = ')[0].trim(); // Show the equation when stepping back
+        } else {
+          display.value = '';
+        }
       } else {
-        display.value = '';
-      }
-      // Remove the '=' and everything after it in the display
-      const equalIndex = display.value.indexOf('=');
-      if (equalIndex !== -1) {
-        display.value = display.value.substring(0, equalIndex).trim();
+        display.value = equation.trim(); // Show the equation when stepping back
+        lastSteppedBack.value = true;
       }
       lastDisplay.value = display.value; // Update lastDisplay to the latest value after stepping back
     }
   }
-
   console.log('After step back - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
 };
 
-const calculate = (expression) => {
-  if (typeof expression !== 'string') {
-    console.error('Invalid expression:', expression);
+const calculateExpression = () => {
+  if (lastSteppedBack.value && history.value.length > 0) {
+    // Update the latest entry in the history
+    const lastHistoryEntry = history.value[history.value.length - 1];
+    const equation = display.value; // Use the current display value as the equation
+    const answer = eval(equation).toString();
+    history.value[history.value.length - 1] = `${equation} = ${answer}`;
+    display.value = answer;
+  } else {
+    calculate(display.value);
+  }
+  currentInput.value = ''; // Clear current input after calculation
+  lastSteppedBack.value = false;
+};
+
+const calculate = (equation) => {
+  if (typeof equation !== 'string') {
+    console.error('Invalid equation:', equation);
     return;
   }
 
   console.log('Calculating...');
   console.log('Before calculate - display:', display.value, 'history:', history.value);
   try {
-    const result = eval(expression).toString();
-    if (isSteppingBack.value && history.value.length > 0) {
-      // Update the latest history item
-      history.value[history.value.length - 1] = `${expression} = ${result}`;
-    } else {
-      // Add a new history item
-      history.value.push(`${expression} = ${result}`);
-    }
-    display.value = result;
+    const answer = eval(equation).toString();
+    history.value.push(`${equation} = ${answer}`);
+    display.value = answer;
     currentInput.value = '';
-    viewingHistory.value = false;
-    isSteppingBack.value = false; // Reset the flag after calculation
     if (showHistory.value) {
       display.value = history.value.join('\n');
     }
@@ -146,48 +178,14 @@ const calculate = (expression) => {
   }
   console.log('After calculate - display:', display.value, 'history:', history.value);
 };
-
-const calculateExpression = () => {
-  calculate(display.value);
-  currentInput.value = ''; // Clear current input after calculation
-};
-
-const toggleHistory = () => {
-  console.log('Toggling history...');
-  console.log('Before toggle - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value);
-  if (showHistory.value) {
-    collapseHistory(); // Collapse history if it is currently expanded
-  } else {
-    lastDisplay.value = display.value;
-    display.value = history.value.join('\n');
-    showHistory.value = true;
-  }
-  console.log('After toggle - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value);
-};
-
-const collapseHistory = () => {
-  console.log('Collapsing history...');
-  console.log('Before collapse - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
-  if (showHistory.value) {
-    showHistory.value = false;
-    if (history.value.length > 0) {
-      if (isSteppingBack.value) {
-        // Maintain the calculation when collapsing after stepping back
-        display.value = history.value[history.value.length - 1].split(' = ')[0].trim();
-      } else {
-        // Show the result when collapsing after calculation
-        display.value = history.value[history.value.length - 1].split(' = ')[1].trim();
-      }
-    } else {
-      display.value = '';
-    }
-    lastDisplay.value = display.value; // Update lastDisplay to the latest value
-  }
-  console.log('After collapse - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
-};
 </script>
 
 <style scoped>
+.centered-title {
+  text-align: center;
+  width: 100%;
+}
+
 .calculator {
   display: flex;
   flex-direction: column;

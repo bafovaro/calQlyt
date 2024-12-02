@@ -7,7 +7,8 @@
           <ion-icon aria-hidden="true" :icon="calculator" />
         </ion-tab-button>
 
-        <ion-tab-button tab="HistoryTab" href="/tabs/HistoryTab">
+        <!-- Conditionally render the HistoryTab button -->
+        <ion-tab-button v-if="showHistoryTab" tab="HistoryTab" href="/tabs/HistoryTab">
           <ion-icon aria-hidden="true" :icon="time" />
         </ion-tab-button>
       </ion-tab-bar>
@@ -18,4 +19,8 @@
 <script setup lang="ts">
 import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
 import { calculator, time } from 'ionicons/icons';
+import { ref } from 'vue';
+
+// Define a reactive variable to control the visibility of the HistoryTab
+const showHistoryTab = ref(false);
 </script>
