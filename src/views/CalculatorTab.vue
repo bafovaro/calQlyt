@@ -118,18 +118,26 @@ const stepBack = () => {
       // Remove the last entry from the history
       history.value.pop();
       display.value = history.value.join('\n');
+      if (history.value.length > 0) {
+        const lastEntry = history.value[history.value.length - 1];
+        const [equation, answer] = lastEntry.split(' = ');
+        lastDisplay.value = answer.trim(); // Update lastDisplay to the answer of the latest history entry
+      } else {
+        lastDisplay.value = '';
+      }
     } else {
       const lastHistoryEntry = history.value.pop();
       if (lastHistoryEntry) {
         const [equation, answer] = lastHistoryEntry.split(' = ');
         display.value = equation.trim(); // Show the equation when stepping back
+        lastDisplay.value = answer.trim(); // Update lastDisplay to the answer of the latest history entry
       } else {
         display.value = '';
+        lastDisplay.value = '';
       }
     }
     lastSteppedBack.value = true;
   }
-  lastDisplay.value = display.value; // Update lastDisplay to the latest value after stepping back
   console.log('After step back - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
 };
 
