@@ -39,5 +39,5 @@
     "vitest": "^0.34.6",
     "vue-tsc": "^2.0.22"
   },
-  "description": "An Ionic project"
+  "description": "A calculator"
 }
