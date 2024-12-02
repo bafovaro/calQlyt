@@ -119,25 +119,17 @@ const stepBack = () => {
       history.value.pop();
       display.value = history.value.join('\n');
     } else {
-      const lastHistoryEntry = history.value[history.value.length - 1];
-      const [equation, answer] = lastHistoryEntry.split(' = ');
-      if (lastSteppedBack.value) {
-        // Remove the latest history item and move to the next
-        history.value.pop();
-        lastSteppedBack.value = false;
-        if (history.value.length > 0) {
-          const previousHistoryEntry = history.value[history.value.length - 1];
-          display.value = previousHistoryEntry.split(' = ')[0].trim(); // Show the equation when stepping back
-        } else {
-          display.value = '';
-        }
-      } else {
+      const lastHistoryEntry = history.value.pop();
+      if (lastHistoryEntry) {
+        const [equation, answer] = lastHistoryEntry.split(' = ');
         display.value = equation.trim(); // Show the equation when stepping back
-        lastSteppedBack.value = true;
+      } else {
+        display.value = '';
       }
-      lastDisplay.value = display.value; // Update lastDisplay to the latest value after stepping back
     }
+    lastSteppedBack.value = true;
   }
+  lastDisplay.value = display.value; // Update lastDisplay to the latest value after stepping back
   console.log('After step back - showHistory:', showHistory.value, 'display:', display.value, 'lastDisplay:', lastDisplay.value, 'history:', history.value);
 };
 
