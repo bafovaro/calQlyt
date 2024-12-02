@@ -55,13 +55,16 @@ const history = ref([]);
 const currentInput = ref('');
 const lastDisplay = ref('');
 const lastSteppedBack = ref(false);
+let consecutiveStepBack = false;
 
 const append = (char) => {
+  consecutiveStepBack = false;
   display.value += char;
   currentInput.value += char;
 };
 
 const clearAll = () => {
+  consecutiveStepBack = false;
   display.value = '';
   history.value = [];
   currentInput.value = '';
@@ -70,6 +73,7 @@ const clearAll = () => {
 };
 
 const backspace = () => {
+  consecutiveStepBack = false;
   if (display.value === 'Error' || display.value === '') {
     return;
   }
@@ -113,6 +117,7 @@ const stepBack = () => {
   if (currentInput.value) {
     currentInput.value = '';
     display.value = '';
+    consecutiveStepBack = false;
   } else if (history.value.length > 0) {
     if (showHistory.value) {
       // Remove the last entry from the history
@@ -125,7 +130,11 @@ const stepBack = () => {
       } else {
         lastDisplay.value = '';
       }
+      consecutiveStepBack = false;
     } else {
+      if (consecutiveStepBack) {
+        history.value.pop();
+      }
       const lastHistoryEntry = history.value[history.value.length - 1];
       if (lastHistoryEntry) {
         const [equation, answer] = lastHistoryEntry.split(' = ');
@@ -135,6 +144,7 @@ const stepBack = () => {
         display.value = '';
         lastDisplay.value = '';
       }
+      consecutiveStepBack = true;
     }
     lastSteppedBack.value = true;
   }
@@ -142,6 +152,7 @@ const stepBack = () => {
 };
 
 const calculateExpression = () => {
+  consecutiveStepBack = false;
   if (lastSteppedBack.value && history.value.length > 0) {
     // Update the latest entry in the history
     const lastHistoryEntry = history.value[history.value.length - 1];
