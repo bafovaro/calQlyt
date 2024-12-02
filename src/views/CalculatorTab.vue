@@ -261,6 +261,7 @@ const pasteFromClipboard = () => {
   width: 100%;
 }
 
+
 ion-button {
   height: 60px;
   font-size: 24px;
