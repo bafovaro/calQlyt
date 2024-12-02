@@ -15,10 +15,16 @@
       <div class="calculator" @click.self="collapseHistory">
         <div class="display" :class="{ expanded: showHistory }" @click.stop="toggleHistory">{{ display }}</div>
         <div class="buttons">
-          <ion-button @click.stop="clearAll" expand="full" color="danger">C</ion-button>
+          <ion-button @click.stop="clearAll" expand="full" color="danger">
+            <ion-icon aria-hidden="true" :icon="closeCircleOutline" />
+          </ion-button>
           <div></div>
-          <div></div>
-          <div></div>
+          <ion-button @click.stop="copyToClipboard" expand="full" :disabled="showHistory" color="primary">
+            <ion-icon aria-hidden="true" :icon="copyOutline" />
+          </ion-button>
+          <ion-button @click.stop="pasteFromClipboard" expand="full" :disabled="showHistory" color="primary">
+            <ion-icon aria-hidden="true" :icon="clipboardOutline" />
+          </ion-button>          
           <ion-button @click.stop="append('7')" expand="full" :disabled="showHistory">7</ion-button>
           <ion-button @click.stop="append('8')" expand="full" :disabled="showHistory">8</ion-button>
           <ion-button @click.stop="append('9')" expand="full" :disabled="showHistory">9</ion-button>
@@ -31,8 +37,12 @@
           <ion-button @click.stop="append('2')" expand="full" :disabled="showHistory">2</ion-button>
           <ion-button @click.stop="append('3')" expand="full" :disabled="showHistory">3</ion-button>
           <ion-button @click.stop="append('-')" expand="full" :disabled="showHistory">-</ion-button>
-          <ion-button @click.stop="stepBack" expand="full" class="backspace"><<</ion-button>
-          <ion-button @click.stop="backspace" expand="full" class="backspace" :disabled="showHistory">&lt;</ion-button>
+          <ion-button @click.stop="stepBack" expand="full" class="backspace">            
+            <ion-icon aria-hidden="true" :icon="playSkipBackOutline" />
+          </ion-button>
+          <ion-button @click.stop="backspace" expand="full" class="backspace" :disabled="showHistory">            
+            <ion-icon aria-hidden="true" :icon="backspaceOutline" />
+          </ion-button>
           <ion-button @click.stop="append('0')" expand="full" :disabled="showHistory">0</ion-button>
           <ion-button @click.stop="append('+')" expand="full" :disabled="showHistory">+</ion-button>
           <div></div>
@@ -47,7 +57,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon } from '@ionic/vue';
+import { copyOutline, clipboardOutline, closeCircleOutline, backspaceOutline, playSkipBackOutline } from 'ionicons/icons';
 
 const showHistory = ref(false);
 const display = ref('');
@@ -189,6 +200,24 @@ const calculate = (equation) => {
   }
   console.log('After calculate - display:', display.value, 'history:', history.value);
 };
+
+const copyToClipboard = () => {
+      navigator.clipboard.writeText(display.value).then(() => {
+        console.log('Text copied to clipboard');
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+};
+
+const pasteFromClipboard = () => {
+      navigator.clipboard.readText().then((value) => {
+        append(value);
+        console.log('Text pasted from clipboard');
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+};
+    
 </script>
 
 <style scoped>
