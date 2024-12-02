@@ -12,7 +12,7 @@
         </ion-toolbar>
       </ion-header>
 
-      <div class="calculator" @click="collapseHistory">
+      <div class="calculator" @click.self="collapseHistory">
         <div class="display" :class="{ expanded: showHistory }" @click.stop="toggleHistory">{{ display }}</div>
         <div class="buttons">
           <ion-button @click.stop="clearAll" expand="full" color="danger">C</ion-button>
