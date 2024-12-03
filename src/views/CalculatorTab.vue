@@ -168,7 +168,7 @@ const calculateExpression = () => {
     // Update the latest entry in the history
     const lastHistoryEntry = history.value[history.value.length - 1];
     const equation = display.value; // Use the current display value as the equation
-    const answer = eval(equation).toString();
+    const answer = parseFloat(eval(equation).toFixed(10)).toString();
     history.value[history.value.length - 1] = `${equation} = ${answer}`;
     display.value = answer;
   } else {
@@ -187,7 +187,7 @@ const calculate = (equation) => {
   console.log('Calculating...');
   console.log('Before calculate - display:', display.value, 'history:', history.value);
   try {
-    const answer = eval(equation).toString();
+    const answer = parseFloat((eval(equation)).toFixed(10)).toString();
     history.value.push(`${equation} = ${answer}`);
     display.value = answer;
     currentInput.value = '';
